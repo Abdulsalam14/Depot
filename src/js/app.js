@@ -1,4 +1,29 @@
 
+// function loadContent(page) {
+//     const contentDiv = document.getElementById('content');
+//     fetch(page + '.html')
+//         .then(response => response.text())
+//         .then(data => {
+//             contentDiv.innerHTML = data;
+//         });
+// }
+
+// function handleNavigation() {
+//     const path = window.location.hash.substring(1);
+//     if (path === '') {
+//         loadContent('index');
+//     } else if (path === 'detail') {
+//         loadContent('detail');
+//     } else {
+//         loadContent('notfound');
+//     }
+// }
+
+// window.addEventListener('hashchange', handleNavigation);
+// window.addEventListener('load', handleNavigation);
+
+
+
 function changeSlide(clickedNumber) {
 
     $('.line').css('width', '20px');
@@ -18,8 +43,8 @@ function changeSlide(clickedNumber) {
 
 }
 
-$(document).ready(function () {
 
+$(document).ready(function () {
 
 
     let currentSlide = 1;
@@ -41,16 +66,182 @@ $(document).ready(function () {
     let autoChangeTimer = setInterval(autoChange, 4000);
 });
 
+// $(document).ready(function() {
+//     var flexContainer = $('.headerr');
+//     console.log(flexContainer)
+//     var item1 = flexContainer.find('.navv');
+//     var item2 = flexContainer.find('.for-logo');
+//     var item3 = flexContainer.find('.header-widget');
+
+//     flexContainer.html(''); // Önce flex-container içeriğini temizleyin
+
+//     flexContainer.append(item2); // İkinci öğeyi ekleyin
+//     flexContainer.append(item3); // Üçüncü öğeyi ekleyin
+//     flexContainer.append(item1); // Birinci öğeyi ekleyin
+//   });
+
+
+let isProcessing = false;
+let basketitems = [];
+function refreshbasket(sku) {
+
+    // if (isProcessing) {
+    //     return;
+    // }
+
+    // isProcessing = true;
+    let elementIndex = basketitems.findIndex(a => a.item.sku === sku);
+    if (elementIndex !== -1) {
+        console.log("rrr")
+        basketitems.splice(elementIndex, 1);
+        updatebasket();
+        fillMainCart();
+    }
+
+    // isProcessing = false;
+}
+
+function updatebasket() {
+    localStorage.setItem("basket", JSON.stringify(basketitems));
+    basketitems = JSON.parse(localStorage.getItem('basket'));
+}
+
+
+function fillMainCart() {
+    let total = 0;
+    let content = "";
+    basketitems.forEach(i => {
+        total += i.item.price * i.itemcount;
+        content += `
+        <div class="maincart-li">
+            <div class="for-li-img">
+            <img src="${i.item.images[0]}" alt="">
+            </div>
+            <div class="lili">
+                <div class="li-text">
+                <h3>${i.item.title}</h3>
+                <p data-card-id="${i.item.sku}" class="li-x">X</p>
+                </div>
+                <div class="for-price">
+                    <span class="item-count">${i.itemcount}x</span>
+                    <span class="price pr-nd">$${i.item.price}</span>
+                </div>
+            </div>
+        </div>`
+    })
+    $(".totall").html(`(<span><span>$</span>${total}</span>)`)
+    $(".full-cart-total .price").html(`$${total}`);
+    $(".full-cart .maincart-ul").html(content);
+}
+
+
+
+let hoverTimeout4;
+
+let hoverTimeout5;
+
+
+$('.for-filter ').mouseenter(function () {
+
+    clearTimeout(hoverTimeout5);
+
+    hoverTimeout4 = setTimeout(function () {
+
+        $('.filter-hover').fadeIn(300)
+
+    }, 100);
+});
+
+
+
+$('.for-filter').mouseleave(function () {
+    hoverTimeout5 = setTimeout(function () {
+        $('.filter-hover').fadeOut(300)
+    }, 400);
+
+    clearTimeout(hoverTimeout4);
+});
+
+function processCarts() {
+    $(".li-x").click(function () {
+        console.log('clickkk')
+        let id = $(this).data('card-id');
+        refreshbasket(id)
+    })
+}
+
+
+
+
 $(document).ready(function () {
 
+    let hovertimeout11;
+    let hoverTimeout22;
+    $(".widget-cart").mouseenter(function () {
+        clearTimeout(hoverTimeout22);
+        hovertimeout11 = setTimeout(function () {
+            basketitems = JSON.parse(localStorage.getItem('basket'));
+            if (basketitems.length == 0) {
+                $(".full-cart").hide();
+                $(".for-empty").show();
+            }
+            else {
+                $(".for-empty").hide();
+                fillMainCart();
+                $(".full-cart").show();
+                $(".li-x").click(function (e) {
+                    console.log('clickkk')
+                    let id = $(this).data('card-id');
+                    refreshbasket(id)
+                })
+            }
+        }, 100)
+    });
 
 
-    var isHovered = false;
+    $(".widget-cart").mouseleave(function () {
+        hoverTimeout22 = setTimeout(function () {
+            $(".full-cart").hide();
+            $(".for-empty").hide();
+        }, 100)
+        clearTimeout(hovertimeout11)
+    });
+
+});
 
 
 
+$(document).ready(function () {
+    $('#menubtn').click(function () {
+        $('.right-menu').addClass('active');
+    });
+
+    $('#xbtn').click(function () {
+        $('.right-menu').removeClass('active');
+    });
 
 
+});
+
+function calculateTotal() {
+    if (localStorage.getItem('basket') === null) {
+        localStorage.setItem('basket', JSON.stringify(basketitems))
+    }
+    else {
+        basketitems = JSON.parse(localStorage.getItem('basket'));
+    }
+    let total = Number(0);
+    if (basketitems.length > 0) {
+        basketitems.forEach(i => {
+            total += i.item.price * i.itemcount;
+        })
+    }
+    console.log(total)
+    $(".totall").html(`(<span><span>$</span>${total}</span>)`)
+}
+
+$(document).ready(function () {
+    calculateTotal();
     let hoverTimeout;
 
     let hoverTimeout2;
@@ -80,20 +271,8 @@ $(document).ready(function () {
     });
 
 
-    $(document).ready(function () {
-        $('#menubtn').click(function () {
-            $('.right-menu').addClass('active');
-        });
-
-        $('#xbtn').click(function () {
-            $('.right-menu').removeClass('active');
-        });
 
 
-    });
-
-
-    let quickelement;
 
 
     $('.inner-li').mouseenter(function () {
@@ -156,23 +335,24 @@ $(document).ready(function () {
 
 
 
-        $('.quick').click(function () {
+        $('.quick').click(function (e) {
             var cardId = $(this).data('card-id');
-            console.log(cardId)
+            // console.log(cardId)
             sku = cardId
             quickFill(sku)
             $('.overlay').show();
             $('.for-quick').fadeIn(300);
-
+            count = 1;
+            e.stopPropagation();
         });
 
         $('#quickx').click(function () {
-            console.log("SDA")
+            // console.log("SDA")
             $('.overlay').hide();
             $('.for-quick').fadeOut(300);
             $('.for-quick').remove();
-            element="";
-            i=0;
+            element = "";
+            i = 0;
 
         });
 
@@ -180,10 +360,38 @@ $(document).ready(function () {
             $(this).hide();
             $('.for-quick').fadeOut(300);
             $('.for-quick').remove();
-            element="";
-            i=0
+            element = "";
+            i = 0
+            count = 1;
         });
 
+        $(".add-to-cart").click(function (e) {
+            let id = $(this).data('card-id');
+            let element = arr.find(a => a.sku == id);
+            let basketitem = {
+                item: element,
+                itemcount: 1
+            }
+            let itemindex = basketitems.findIndex(item => item.item.sku == basketitem.item.sku);
+            if (itemindex !== -1) {
+                basketitems[itemindex].itemcount += basketitem.itemcount;
+            }
+            else {
+                basketitems.push(basketitem);
+            }
+            updatebasket();
+            fillMainCart();
+            e.stopPropagation();
+        })
+
+
+        $(".cards").css('min-height', '400px')
+
+        $(".card").click(function () {
+            let id = $(this).data('card-id');
+            localStorage.setItem('selecteditem', id)
+            location.href = "detail.html";
+        })
 
     }
 
@@ -193,6 +401,8 @@ $(document).ready(function () {
     let i = 0;
 
     let count = 1;
+
+
 
     function quickFill(sku) {
 
@@ -255,15 +465,16 @@ $(document).ready(function () {
                         </div>
                         <h6 id="quickx">X</h6>
                     </div>
+                </section>
         
         `
         $('.aa').children().append(content);
 
         $('#quickx').click(function () {
-            console.log("SDA")
             $('.overlay').hide();
             $('.for-quick').fadeOut();
             $('.for-quick').remove();
+            count = 1;
 
         });
 
@@ -295,6 +506,22 @@ $(document).ready(function () {
 
         });
 
+        $('.addbtn').click(function () {
+            let basketitem = {
+                item: element,
+                itemcount: count
+            }
+            let itemindex = basketitems.findIndex(item => item.item.sku == basketitem.item.sku);
+            if (itemindex !== -1) {
+                basketitems[itemindex].itemcount += basketitem.itemcount;
+            }
+            else {
+                basketitems.push(basketitem);
+            }
+            updatebasket();
+            fillMainCart();
+        });
+
 
 
     }
@@ -312,7 +539,7 @@ $(document).ready(function () {
                 oldprice = ""
             }
             content += `
-                    <div class="card" >
+                    <div class="card" data-card-id="${element.sku}" >
                     <div class="card-img">
                         <img src="${element.images[0]}" alt="">
                         <div class="card-hover-2">
@@ -324,7 +551,7 @@ $(document).ready(function () {
                   </div>
                   <p class="card-title">${element.title}</p>
                     <div class="card-text">
-                        <span class="add-to-cart">Add To Cart</span>
+                        <span class="add-to-cart" data-card-id="${element.sku}">Add To Cart</span>
                         <span class="prices">
                             <span class="old-price">${oldprice}</span>
                             <span class="price">$${element.price}</span>
@@ -346,12 +573,10 @@ $(document).ready(function () {
     }
 
     $.get("db.json", function (response, status) {
-        console.log(response.items['item1'])
         for (let i = 0; i < 8; i++) {
-            const element = response.items[`item${i + 1}`];
+            const element = response.items[i];
             arr.push(element);
         }
-
 
         $('.category-titles h5').click(function () {
             $('.category-titles h5').removeClass('category-active')
