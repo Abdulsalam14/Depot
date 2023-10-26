@@ -168,6 +168,9 @@ function processCarts() {
         let id = $(this).data('card-id');
         refreshbasket(id)
     })
+    $(".widget-cart").click(function(){
+        location.href = "cart.html";
+    })
 }
 
 

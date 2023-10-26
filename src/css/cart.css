@@ -1,0 +1,83 @@
+@import url('https://fonts.googleapis.com/css2?family=Catamaran&family=Open+Sans&family=Poppins&family=Raleway&family=Rubik&family=Sen&family=Source+Sans+3&display=swap');
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+}
+
+
+footer{
+    background-color: #080808;
+    border-bottom: 1px solid  #4d4d4d;
+    font-family: 'Catamaran', sans-serif;
+}
+
+
+.inner-ul2{
+    width: 70%;
+    margin: auto;
+    padding: 20px;
+    color: #fff;
+}
+
+.inner-ul2 li{
+    list-style: none;
+    color: #fff;
+}
+
+
+.inner-li {
+    overflow: hidden;
+    color: #a5a5a5;
+    cursor: pointer;
+    font-size: 14px !important;
+    width: 155px;
+    transition: margin-right 0.8s;
+    margin-bottom: 3px;
+}
+
+.inner-li i {
+    transition: margin-right 0.5s;
+
+}
+
+.tam {
+    overflow: hidden;
+    margin-left: -13px;
+    transition: 0.3s;
+}
+
+.Title {
+    color: #fff;
+    font-size: 16px;
+    line-height: 1.1em;
+    font-weight: 600;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    margin-bottom: 30px;
+}
+
+
+.conta {
+    display: flex;
+    justify-content: space-between;
+}
+
+.end{
+    width: 70%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'Catamaran', sans-serif;
+
+}
+
+.end span{
+    padding: 10px 0;
+    font-size: 12px;
+    letter-spacing: 0;
+    font-weight: 100;
+    color: #929292;
+}
