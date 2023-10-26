@@ -531,6 +531,9 @@ $(document).ready(function () {
             let sale = element.sale == '0' ? " " : "-" + element.sale + "%"
             let isnew = element.isnew ? "NEW" : "";
             let oldprice;
+            console.log(element.isnew)
+            console.log(isnew)
+            
             if (element.sale != '0') {
                 let a = Number(element.sale) / 100;
                 oldprice = Math.ceil(Number(element.price) / (1 - a));

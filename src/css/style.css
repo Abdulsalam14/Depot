@@ -739,7 +739,7 @@ nav>ul>li {
     padding: 10px 20px;
     color: #929292;
     justify-content: space-between;
-    z-index: -5;
+    z-index: 5;
 }
 
 .card-img img{
