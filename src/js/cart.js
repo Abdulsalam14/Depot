@@ -12,7 +12,7 @@ function common() {
             updatebasket();
             fillMainCart();
         }
-        else{
+        else {
             console.log('sssd')
         }
     }
@@ -177,78 +177,76 @@ function common() {
         });
 
 
+        // $(".shopping-cart").hide();
 
 
 
-        function processCards() {
-
-            $('.card').mouseenter(function () {
-                $(this).find('.card-hover-2').css('bottom', '0%');
-
-            })
-
-            $('.card').mouseleave(function () {
-                $(this).find('.card-hover-2').css('bottom', '-12%');
-            })
-
-
-
-            $('.quick').click(function (event) {
-                var cardId = $(this).data('card-id');
-                sku = cardId
-                quickFill(sku)
-                $('.overlay').show();
-                $('.for-quick').fadeIn(300);
-                count = 1
-                event.stopPropagation();
-            });
-
-            $('#quickx').click(function () {
-                $('.overlay').hide();
-                $('.for-quick').fadeOut(300);
-                $('.for-quick').remove();
-                element = "";
-                i = 0;
-
-            });
-
-            $('.overlay').click(function () {
-                $(this).hide();
-                $('.for-quick').fadeOut(300);
-                $('.for-quick').remove();
-                element = "";
-                i = 0
-                count = 1;
-            });
-
-            $(".add-to-cart").click(function (e) {
-                let id = $(this).data('card-id');
-                let element = arr.find(a => a.sku == id);
-                let basketitem = {
-                    item: element,
-                    itemcount: 1
-                }
-
-                let itemindex = basketitems.findIndex(item => item.item.sku == basketitem.item.sku);
-                if (itemindex !== -1) {
-                    basketitems[itemindex].itemcount += basketitem.itemcount;
-                }
-                else {
-                    basketitems.push(basketitem);
+        function processCartitems() {
+            $(".remove-product").click(function () {
+                let id = $(this).parent().data('cart-id');
+                let element = basketitems.find(i => i.item.sku == id);
+                if (element) {
+                    basketitems.splice(basketitems.indexOf(element), 1);
                 }
                 updatebasket();
                 fillMainCart();
-                e.stopPropagation();
+                fillcart();
             })
 
 
-            $(".card").click(function () {
-                let id = $(this).data('card-id');
-                localStorage.setItem('selecteditem', id)
-                location.href = "detail.html";
+            $(".count-left-cart").click(function () {
+                let id = $(this).parent().data('cart-id');
+                let element = basketitems.find(i => i.item.sku == id);
+                if (element) {
+                    let index = basketitems.indexOf(element);
+                    if (element.itemcount > 1) {
+                        element.itemcount -= 1;
+                        basketitems[index] = element;
+                    }
+                    else {
+                        basketitems.splice(index, 1)
+                    }
+                }
+                updatebasket();
+                fillMainCart();
+                fillcart();
             })
 
+            $(".count-right-cart").click(function () {
+                console.log("ASD")
+                let id = $(this).parent().data('cart-id');
+                let element = basketitems.find(i => i.item.sku == id && i.itemcount < 500);
+                if (element) {
+                    let index = basketitems.indexOf(element);
+                    element.itemcount += 1;
+                    basketitems[index] = element;
+                }
+                updatebasket();
+                fillMainCart();
+                fillcart();
+            })
+
+            let fortotal=false;
+            $(".for-radio input").click(function (e) {
+                $(".for-radio input").prop('checked', false)
+                $(this).prop('checked', true);
+                index = $(this).data('index');
+                if (index == 2) {
+                    let total = parseFloat($("#totals-total").text().replace('$', ''));
+                    $("#totals-total").html(`$${total+=10}`);
+                    fortotal=true;
+                }
+                else{
+                    if(fortotal){
+                        let total = parseFloat($("#totals-total").text().replace('$', ''));
+                        $("#totals-total").html(`$${total-=10}`);
+                        fortotal=false;
+                    }
+                }
+            })
         }
+
+
 
         let sku = 0;
 
@@ -260,382 +258,50 @@ function common() {
 
         let count2 = 1
 
-        function processSelected(element2) {
-            $('#count-right-dt').click(function () {
 
-                if (count2 <= 500) count2++;
-                $('.detail-item-txt-count .counter span').html(count2)
-
-            });
-            $('#count-left-dt').click(function () {
-
-                if (count2 > 1) count2--;
-                $('.detail-item-txt-count .counter span').html(count2)
-
-            });
-
-            $('#addbtn-dt').click(function () {
-                let basketitem = {
-                    item: element2,
-                    itemcount: count2
-                }
-                let itemindex = basketitems.findIndex(item => item.item.sku == basketitem.item.sku);
-                if (itemindex !== -1) {
-                    basketitems[itemindex].itemcount += basketitem.itemcount;
-                }
-                else {
-                    basketitems.push(basketitem);
-                }
-                updatebasket();
-                fillMainCart();
-                count2 = 1;
-                $('.detail-item-txt-count .counter span').html(count2)
-            });
-        }
-
-
-        function quickFill(sku) {
-
-            let content = "";
-            element = arr.find(a => a.sku == sku);
-
-            let sale = element.sale == '0' ? " " : "-" + element.sale + "%"
-            let isnew = element.isnew ? "NEW" : "";
-            let oldprice;
-            if (element.sale != '0') {
-                let a = Number(element.sale) / 100;
-                oldprice = '$' + Math.ceil(Number(element.price) / (1 - a));
+        function fillcart() {
+            if (basketitems.length == 0) {
+                $(".shopping-cart").hide();
+                $(".for-cart-empty").show();
             }
             else {
-                oldprice = ""
-            }
-            content += `
-            <section class="for-quick">
-                    <div class="hov">
-                        <div class="for-qimg">
-                            <i id="left" class="fa-solid fa-arrow-left"></i>
-                            <img src=${element.images[i]} alt="">
-                            <i id="right" class="fa-solid fa-arrow-right"></i>
-                        </div>
-                        <div class="for-qtxt">
-                            <div class="qtxt-top">
-                                <h3>${element.title}</h3>
-                                <h5><span class='for-line'>${oldprice}</span>$${element.price}</h5>
-                            </div>
-                            <div class="qtxt-mid">
-                                <div class="for-stars">
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star"></span>
-                                    <span class="fa fa-star"></span>
+                total = 0;
+                content = "";
+                basketitems.forEach(i => {
+                    total += i.item.price * i.itemcount;
+                    content += `
+                    <div class="shop-cart-item" data-cart-id="${i.item.sku}">
+                                <span class="remove-product">X</span>
+                                <div class="cartitem-img">
+                                    <img src=${i.item.images[0]} alt="">
                                 </div>
-                                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt itaque perferendis
-                                    perspiciatis quos voluptatem nostrum totam dolor, qui aspernatur ex non magnam quae id odio
-                                    laudantium odit ab autem sint.</p>
-                            </div>
-                            <div class="qtxt-count">
+                                <h3 class="cartitem-title">${i.item.title}</h3>
+                                <span class="cartitem-price">${i.item.price}</span>
                                 <div class="count">
                                     <span>Quantity</span>
-                                    <div class="counter">
-                                        <i id='count-left' class="fa-solid fa-chevron-left"></i>
-                                        <span>${count}</span>
-                                        <i id='count-right' class="fa-solid fa-chevron-right"></i>
+                                    <div class="counter" data-cart-id="${i.item.sku}">
+                                        <i class="fa-solid fa-chevron-left count-left-cart"></i>
+                                        <span>${i.itemcount}</span>
+                                        <i class="fa-solid fa-chevron-right count-right-cart"></i>
                                     </div>
                                 </div>
-                                <div class="addbtn">
-                                    <button>ADD TO CART</button>
-                                </div>
+                                <span class="cartitem-totalprice">$${i.item.price * i.itemcount}</span>
                             </div>
-                            <div class="qtxt-bot">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>ADD TO WISHLIST</p>
-                            </div>
-                            <!-- <h1>ASDASDASDSDASD ASDSAD</h1> -->
-                        </div>
-                        <h6 id="quickx">X</h6>
-                    </div>
-        
-        `
-            $('.aa').children().append(content);
+                    `
+                })
+                $("#subtotal").html(`$${total}`);
+                $("#totals-total").html(`$${total}`);
+                $(".shop-cart-items").html(content);
+                $(".shopping-cart").show();
 
-            $('#quickx').click(function () {
-                $('.overlay').hide();
-                $('.for-quick').fadeOut();
-                $('.for-quick').remove();
-                count = 1;
+                processCartitems()
 
-            });
-
-            $('#right').click(function () {
-
-                if (i < 4) i++;
-                else i = 0;
-                $('.for-qimg img').attr('src', `${element.images[i]}`);
-
-            });
-            $('#left').click(function () {
-
-                if (i > 0) i--;
-                else i = 4;
-                $('.for-qimg img').attr('src', `${element.images[i]}`);
-
-            });
-
-            $('#count-right').click(function () {
-
-                if (count <= 500) count++;
-                console.log(count)
-                $('.qtxt-count .counter span').html(count)
-
-            });
-            $('#count-left').click(function () {
-
-                if (count > 1) count--;
-                $('.qtxt-count .counter span').html(count)
-
-            });
-
-            $('.addbtn').click(function () {
-                let basketitem = {
-                    item: element,
-                    itemcount: count
-                }
-                let itemindex = basketitems.findIndex(item => item.item.sku == basketitem.item.sku);
-                if (itemindex !== -1) {
-                    basketitems[itemindex].itemcount += basketitem.itemcount;
-                }
-                else {
-                    basketitems.push(basketitem);
-                }
-                updatebasket();
-                fillMainCart();
-            });
-
-
-
-        }
-        function fill(arr) {
-            let content = "";
-            arr.forEach(element => {
-                let sale = element.sale == '0' ? " " : "-" + element.sale + "%"
-                let isnew = element.isnew ? "NEW" : "";
-                let oldprice;
-                if (element.sale != '0') {
-                    let a = Number(element.sale) / 100;
-                    oldprice = Math.ceil(Number(element.price) / (1 - a));
-                }
-                else {
-                    oldprice = ""
-                }
-                content += `
-                    <div class="card" data-card-id="${element.sku}">
-                    <div class="card-img">
-                        <img src="${element.images[0]}" alt="">
-                        <div class="card-hover-2">
-                            <p class="quick" data-card-id="${element.sku}">Quick Look</p>
-                          <div class="for-heart">
-                              <i class="fa-regular fa-heart"></i>
-                          </div>
-                     </div>
-                  </div>
-                  <p class="card-title">${element.title}</p>
-                    <div class="card-text">
-                        <span class="add-to-cart" data-card-id="${element.sku}">Add To Cart</span>
-                        <span class="prices">
-                            <span class="old-price">${oldprice}</span>
-                            <span class="price">$${element.price}</span>
-                        </span>
-                    </div>
-                    <div class="card-hover1">
-                        <p class="for-new">${isnew}</p>
-                        <p class="for-sale">${sale}</p>
-                        </div>
-                    </div>
-                        `
-            });
-            $('.category-items').css('opacity', 0);
-            setTimeout(function () {
-                $('.card-items').html(content)
-                $('.category-items').css('opacity', 1);
-                processCards()
-            }, 500);
+            }
         }
 
 
-        $.get("db.json", function (response, status) {
-            for (let i = 0; i < response.items.length; i++) {
-                const element = response.items[i];
-                arr.push(element);
-            }
-            let id = localStorage.getItem('selecteditem');
-            let selected = arr.find(e => e.sku == id);
+        fillcart();
 
-            let categories = ""
-            let tags = "";
-            console.log(selected)
-            for (let i = 0; i < selected.categories.length; i++) {
-                categories += selected.categories[i];
-                if (i < selected.categories.length - 1) categories += ","
-
-            }
-
-            for (let i = 0; i < selected.tags.length; i++) {
-
-                tags += selected.tags[i];
-                if (i < selected.tags.length - 1) tags += ","
-
-            }
-
-            let oldprice;
-            if (selected.sale != '0') {
-                let a = Number(selected.sale) / 100;
-                oldprice = Math.ceil(Number(selected.price) / (1 - a));
-            }
-            else {
-                oldprice = ""
-            }
-
-            let newarr = [];
-            arr.forEach(a => {
-                a.material.includes(selected.material[0])
-                if (newarr.length < 4 && a != selected) newarr.push(a)
-            })
-            content = `
-            
-            <div class="item-detail" style="margin-top: 100px; padding: 50px; width: 75%;">
-                <h2><ahref="index.html">Home</a>/<a href="sidebar.html">With-Sidebar</a>/<a>${categories}</a>/<a>${selected.title}</a></h2>
-                <div class="item-full">
-                    <div class="images">
-                        <div class="other-images">
-                            <div class="other-images-item">
-                                <img src="${selected.images[1]}" alt="">
-                            </div>
-                            <div class="other-images-item">
-                                <img src="${selected.images[2]}"  alt="">
-                            </div>
-                            <div class="other-images-item">
-                                <img src="${selected.images[3]}"  alt="">
-                            </div>
-                            <div style="margin-bottom: 0;" class="other-images-item">
-                                <img src="${selected.images[4]}"  alt="">
-                            </div>
-                        </div>
-                        <div class="main-image">
-                            <img src="${selected.images[0]}"  alt="">
-                        </div>
-                    </div>
-                    <div class="info-detail-item">
-                        <div class="detail-item-txt">
-                            <div class="detail-item-txt-top">
-                                <h3>${selected.title}</h3>
-                                <h5><span class='for-line'>${oldprice}</span>$${selected.price}</h5>
-                            </div>
-                            <div class="detail-item-txt-mid">
-                                <div class="for-stars">
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star checked"></span>
-                                    <span class="fa fa-star"></span>
-                                </div>
-                                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Nesciunt itaque perferendis
-                                    perspiciatis quos voluptatem nostrum totam dolor, qui aspernatur ex non magnam quae
-                                    id odio
-                                    laudantium odit ab autem sint.</p>
-                            </div>
-                            <div class="detail-item-txt-count">
-                                <div class="count">
-                                    <span>Quantity</span>
-                                    <div class="counter">
-                                        <i id='count-left-dt' class="fa-solid fa-chevron-left"></i>
-                                        <span>${count2}</span>
-                                        <i id='count-right-dt' class="fa-solid fa-chevron-right"></i>
-                                    </div>
-                                </div>
-                                <div id='addbtn-dt' class="addbtn">
-                                    <button>ADD TO CART</button>
-                                </div>
-                            </div>
-                            <div class="detail-item-txt-bot">
-                                <i class="fa-regular fa-heart"></i>
-                                <p>ADD TO WISHLIST</p>
-                            </div>
-                            <div class="detail-item-about">
-                                <div class="table">
-                                    <p>SKU:</p><p id="sku">${selected.sku}</p>
-                                </div>
-                                <div class="table">
-                                    <p>Categories:</p><p id="categories">${categories}</p>
-                                </div>
-                                <div class="table">
-                                    <p>Tags:</p><p id="tags">${tags}</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tabs">
-                <div class="active" data-index="1">Description</div>
-                <div data-index="2">Additional Information</div>
-                <div data-index="3">rewiews<span class="review-count">(0)</span></div>
-            </div>
-        </div>
-
-        <div class="content-back">
-            <div class="content">
-                <div class="description show" data-index="1">
-                    <h2>Description</h2>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Non accusamus voluptatum a velit
-                        deserunt aliquid ab consequuntur repellat ea eaque corporis dolore quaerat temporibus
-                        consectetur, similique magni minus placeat architecto.
-                        Reprehenderit ex minima nisi eum ducimus iusto impedit quo omnis aperiam tempora neque eos ipsa
-                        veniam rerum, cupiditate explicabo dolor? Repudiandae id eius necessitatibus corrupti aperiam?
-                        Vitae libero animi dicta!</p>
-                </div>
-                <div class="additional" data-index="2">
-                    <h2>Additional Information</h2>
-                    <div >
-                        <div class="table">
-                            <p>Wegiht</p><p>2kg</p>
-                        </div>
-                        <div class="table">
-                            <p>Dimensions</p><p>10x10x15</p>
-                        </div>
-                        <div class="table">
-                            <p >Color</p><p id="color">${selected.color}</p>
-                        </div>
-                        <div class="table">
-                            <p >Material</p><p id="material">${selected.material}</p>
-                        </div>
-                    </div>
-                </div>
-                <div data-index="3">
-                    Empty
-                </div>
-            </div>
-        </div>
-        <div style="margin-top: 100px;">
-            <h2></h2>
-        </div>
-        <div class="cards" >
-            <h4>Related Products</h4>
-            <div class="aa">
-                <div class="card-items">
-                </div>
-            </div>
-        </div>
-            
-            `
-
-            $('.bott').html(content)
-            fill(newarr)
-            process();
-            processCards()
-            processCarts()
-            processSelected(selected);
-        })
 
     })
 
