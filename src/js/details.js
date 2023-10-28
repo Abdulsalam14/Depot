@@ -503,7 +503,7 @@ function common() {
             })
             content = `
             
-            <div class="item-detail" style="margin-top: 100px; padding: 50px; width: 75%;">
+            <div class="item-detail">
                 <h2><ahref="index.html">Home</a>/<a href="sidebar.html">With-Sidebar</a>/<a>${categories}</a>/<a>${selected.title}</a></h2>
                 <div class="item-full">
                     <div class="images">
